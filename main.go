@@ -12,31 +12,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
-// Global variables to hold the command line flags to drive the todo CLI
+// Global variables to hold the command line flags to drive the voter CLI
 // application
 var (
 	hostFlag string
 	portFlag uint
 )
 
-// processCmdLineFlags parses the command line flags for our CLI
-//
-// TODO: This function uses the flag package to parse the command line
-//		 flags.  The flag package is not very flexible and can lead to
-//		 some confusing code.
-
-//			 REQUIRED:     Study the code below, and make sure you understand
-//						   how it works.  Go online and readup on how the
-//						   flag package works.  Then, write a nice comment
-//				  		   block to document this function that highights that
-//						   you understand how it works.
-//
-//			 EXTRA CREDIT: The best CLI and command line processor for
-//						   go is called Cobra.  Refactor this function to
-//						   use it.  See github.com/spf13/cobra for information
-//						   on how to use it.
-//
-//	 YOUR ANSWER: <GOES HERE>
 func processCmdLineFlags() {
 
 	//Note some networking lingo, some frameworks start the server on localhost
@@ -53,7 +35,7 @@ func processCmdLineFlags() {
 	flag.Parse()
 }
 
-// main is the entry point for our todo API application.  It processes
+// main is the entry point for our voter API application.  It processes
 // the command line flags and then uses the db package to perform the
 // requested operation
 func main() {
@@ -93,7 +75,7 @@ func main() {
 
 	//We will now show a common way to version an API and add a new
 	//version of an API handler under /v2.  This new API will support
-	//a path parameter to search for todos based on a status
+	//a path parameter to search for voters based on a status
 	// v2 := app.Group("/v2")
 	// v2.Get("/voter", apiHandler.ListSelectVoters)
 

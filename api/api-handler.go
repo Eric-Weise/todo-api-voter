@@ -29,7 +29,7 @@ func New() (*VoterAPI, error) {
 //Below we implement the API functions.  Some of the framework
 //things you will see include:
 //   1) How to extract a parameter from the URL, for example
-//	  the id parameter in /todo/:id
+//	  the id parameter in /voter/:id
 //   2) How to extract the body of a POST request
 //   3) How to return JSON and a correctly formed HTTP status code
 //	  for example, 200 for OK, 404 for not found, etc.  This is done
@@ -56,66 +56,8 @@ func (v *VoterAPI) ListAllVoters(c *fiber.Ctx) error {
 	return c.JSON(voterList)
 }
 
-// implementation for GET /v2/todo
-// returns todos that are either done or not done
-// depending on the value of the done query parameter
-// for example, /v2/todo?done=true will return all
-// todos that are done.  Note you can have multiple
-// query parameters, for example /v2/todo?done=true&foo=bar
-// func (v *VoterAPI) ListSelectVoters(c *fiber.Ctx) error {
-// 	//lets first load the data
-// 	voterList, err := v.db.GetAllVoters()
-// 	if err != nil {
-// 		log.Println("Error Getting Database Items: ", err)
-// 		return fiber.NewError(http.StatusNotFound)
-// 	}
-// 	//If the database is empty, make an empty slice so that the
-// 	//JSON marshalling works correctly
-// 	if voterList == nil {
-// 		voterList = make([]db.Voter, 0)
-// 	}
-
-// 	//Note that the query parameter is a string, so we
-// 	//need to convert it to a bool
-// 	doneS := c.Query("done")
-
-// 	//if the doneS is empty, then we will return all items
-// 	if doneS == "" {
-// 		return c.JSON(voterList)
-// 	}
-
-// 	//Now we can handle the case where doneS is not empty
-// 	//and we need to filter the list based on the doneS value
-
-// 	done, err := strconv.ParseBool(doneS)
-// 	if err != nil {
-// 		log.Println("Error converting done to bool: ", err)
-// 		return fiber.NewError(http.StatusBadRequest)
-// 	}
-
-// 	//Now we need to filter the list based on the done value
-// 	//that was passed in.  We will create a new slice and
-// 	//only add items that match the done value
-// 	var filteredList []db.Voter
-// 	for _, item := range voterList {
-// 		if item.IsDone == done {
-// 			filteredList = append(filteredList, item)
-// 		}
-// 	}
-
-// 	//Note that the database returns a nil slice if there are no items
-// 	//in the database.  We need to convert this to an empty slice
-// 	//so that the JSON marshalling works correctly.  We want to return
-// 	//an empty slice, not a nil slice. This will result in the json being []
-// 	if filteredList == nil {
-// 		filteredList = make([]db.Voter, 0)
-// 	}
-
-// 	return c.JSON(filteredList)
-// }
-
-// implementation for GET /todo/:id
-// returns a single todo
+// implementation for GET /voter/:id
+// returns a single voter
 func (v *VoterAPI) GetVoter(c *fiber.Ctx) error {
 
 	//Note go is minimalistic, so we have to get the
@@ -200,8 +142,8 @@ func (v *VoterAPI) AddSinglePollToVoter(c *fiber.Ctx) error {
 	return c.JSON(voterId)
 }
 
-// implementation for POST /todo
-// adds a new todo
+// implementation for POST /voter
+// adds a new voter
 func (v *VoterAPI) AddVoter(c *fiber.Ctx) error {
 	var voter db.Voter
 
@@ -229,7 +171,7 @@ func (v *VoterAPI) AddVoter(c *fiber.Ctx) error {
 	return c.JSON(voter)
 }
 
-// implementation for PUT /todo
+// implementation for PUT /voter
 // Web api standards use PUT for Updates
 func (v *VoterAPI) UpdateVoter(c *fiber.Ctx) error {
 	var voter db.Voter
@@ -246,8 +188,8 @@ func (v *VoterAPI) UpdateVoter(c *fiber.Ctx) error {
 	return c.JSON(voter)
 }
 
-// implementation for DELETE /todo/:id
-// deletes a todo
+// implementation for DELETE /voter/:id
+// deletes a voter
 func (v *VoterAPI) DeleteVoter(c *fiber.Ctx) error {
 	id, err := c.ParamsInt("id")
 	if err != nil {
@@ -262,8 +204,8 @@ func (v *VoterAPI) DeleteVoter(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).SendString("Delete OK")
 }
 
-// implementation for DELETE /todo
-// deletes all todos
+// implementation for DELETE /voter
+// deletes all voters
 func (v *VoterAPI) DeleteAllVoters(c *fiber.Ctx) error {
 
 	if err := v.db.DeleteAll(); err != nil {
