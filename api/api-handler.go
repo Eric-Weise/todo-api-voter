@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	"drexel.edu/todo/db"
+	"drexel.edu/voter/db"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -37,8 +37,6 @@ func New() (*VoterAPI, error) {
 //   4) How to return an error code and abort the request.  This is
 //	  done using the c.AbortWithStatus() function
 
-// implementation for GET /todo
-// returns all todos
 func (v *VoterAPI) ListAllVoters(c *fiber.Ctx) error {
 
 	voterList, err := v.db.GetAllVoters()
@@ -141,6 +139,65 @@ func (v *VoterAPI) GetVoter(c *fiber.Ctx) error {
 	//Git will automatically convert the struct to JSON
 	//and set the content-type header to application/json
 	return c.JSON(voter)
+}
+
+func (v *VoterAPI) GetPollHistoryFromVoter(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
+	voterHistory, err := v.db.GetVoteHistory(uint(id))
+	if err != nil {
+		log.Println("Item not found:", err)
+		return fiber.NewError(http.StatusNotFound)
+	}
+	return c.JSON(voterHistory)
+}
+
+func (v *VoterAPI) GetSinglePollFromVoter(c *fiber.Ctx) error {
+	voterIdStr := c.Params("id")
+	pollIdStr := c.Params("pollid")
+
+	voterid, err := strconv.Atoi(voterIdStr)
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
+	pollid, err := strconv.Atoi(pollIdStr)
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
+	poll, err := v.db.GetSingleVoteHistory(uint(voterid), uint(pollid))
+	if err != nil {
+		log.Println("Item not found:", err)
+		return fiber.NewError(http.StatusNotFound)
+	}
+	return c.JSON(poll)
+}
+
+func (v *VoterAPI) AddSinglePollToVoter(c *fiber.Ctx) error {
+	voterIdStr := c.Params("id")
+	voterId, err := strconv.Atoi(voterIdStr)
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
+	var poll db.VoterHistory
+
+	if err := c.BodyParser(&poll); err != nil {
+		log.Println("Error binding JSON: ", err)
+		return fiber.NewError(http.StatusBadRequest)
+	}
+
+	if err := v.db.AddPoll(uint(voterId), poll); err != nil {
+		log.Println("Failed to add poll to voter:", err)
+		return fiber.NewError(http.StatusNotFound, "Failed to add poll to voter")
+	}
+
+	return c.JSON(voterId)
 }
 
 // implementation for POST /todo

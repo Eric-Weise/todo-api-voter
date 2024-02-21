@@ -1,11 +1,13 @@
 package tests
 
 import (
+	"encoding/json"
 	"log"
 	"os"
 	"testing"
+	"time"
 
-	"drexel.edu/todo/db"
+	"drexel.edu/voter/db"
 	fake "github.com/brianvoe/gofakeit/v6" //aliasing package name
 	"github.com/go-resty/resty/v2"
 	"github.com/stretchr/testify/assert"
@@ -40,6 +42,18 @@ func newRandVoter(id uint) db.Voter {
 		VoterId: id,
 		Name:    fake.Name(),
 		Email:   fake.Email(),
+		VoteHistory: []db.VoterHistory{
+			{
+				PollId:   id,
+				VoteId:   id,
+				VoteDate: time.Time{},
+			},
+			{
+				PollId:   id + 1,
+				VoteId:   id + 1,
+				VoteDate: time.Time{},
+			},
+		},
 	}
 }
 
@@ -65,6 +79,54 @@ func Test_GetAllVoters(t *testing.T) {
 	assert.Equal(t, 200, rsp.StatusCode())
 
 	assert.Equal(t, 3, len(items))
+}
+
+func Test_GetOneVoter(t *testing.T) {
+
+	var item db.Voter
+
+	rsp, err := cli.R().SetResult(&item).Get(BASE_API + "/voter/2")
+	assert.Nil(t, err)
+	assert.Equal(t, 200, rsp.StatusCode(), "voter #2 expected")
+
+}
+
+func Test_GetPollsFromVoter(t *testing.T) {
+
+	rsp, err := cli.R().Get(BASE_API + "/voter/2/polls")
+	assert.Nil(t, err)
+	assert.Equal(t, 200, rsp.StatusCode(), "voter #2 expected")
+
+	var polls []db.VoterHistory
+	err = json.Unmarshal(rsp.Body(), &polls)
+	assert.Nil(t, err)
+
+	assert.Greater(t, len(polls), 0, "There are no polls in this voter")
+
+}
+
+func Test_AddPollToVoter(t *testing.T) {
+	var item db.Voter
+
+	rsp, err := cli.R().SetResult(&item).Get(BASE_API + "/voter/2")
+	assert.Nil(t, err)
+	assert.Equal(t, 200, rsp.StatusCode(), "voter #2 expected")
+
+	poll := map[string]interface{}{
+		"PollId":   50,
+		"VoteId":   50,
+		"VoteDate": time.Time{},
+	}
+
+	rsp, err = cli.R().
+		SetBody(poll).
+		Post(BASE_API + "/voter/2")
+
+	assert.Nil(t, err)
+	assert.Equal(t, 200, rsp.StatusCode())
+
+	//var voterWithUpdatedPoll db.Voter
+
 }
 
 func Test_DeleteVoter(t *testing.T) {

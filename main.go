@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"drexel.edu/todo/api"
+	"drexel.edu/voter/api"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -81,6 +81,10 @@ func main() {
 	app.Delete("/voter", apiHandler.DeleteAllVoters)
 	app.Delete("/voter/:id<int>", apiHandler.DeleteVoter)
 	app.Get("/voter/:id<int>", apiHandler.GetVoter)
+
+	app.Get("/voter/:id<int>/polls", apiHandler.GetPollHistoryFromVoter)
+	app.Get("/voter/:id<int>/polls/:pollid", apiHandler.GetSinglePollFromVoter)
+	app.Post("/voter/:id<int>", apiHandler.AddSinglePollToVoter)
 
 	app.Get("/crash", apiHandler.CrashSim)
 	app.Get("/crash2", apiHandler.CrashSim2)
